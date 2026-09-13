@@ -31,7 +31,7 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
 
 - [x] `supabase/migrations/`にテーブル定義を作成する：`profiles` / `monthly_uploads`（`status`列含む）/ `sales_transactions` / `ai_reports`（RLS有効化も実施済み）
 - [x] `sales_transactions`に外部キー制約（`target_month` -> `monthly_uploads.target_month`）とインデックス（`target_month`, `customer_id`, `order_date`）を設定する
-- [ ] RPC関数`replace_monthly_sales`を実装する（ARCH 4.2章のSQL通り。UPSERT→削除→挿入→完了更新→ai_reports無効化を1関数に集約）
+- [x] RPC関数`replace_monthly_sales`を実装する（ARCH 4.2章のSQL通り。UPSERT→削除→挿入→完了更新→ai_reports無効化を1関数に集約）
 - [ ] RPC関数`get_monthly_summary`を実装する（ARCH 6.1章）
 - [ ] RPC関数`get_category_breakdown`を実装する（ARCH 6.3章）
 - [ ] RPC関数`get_sku_ranking`を実装する（ARCH 6.4章）
