@@ -18,7 +18,7 @@
 - [x] Tailwind CSSを導入し、基本カラー（白／ネイビー `#1A2E5C`）をテーマ設定する（REQ 18章）
 - [x] GitHubリポジトリを作成する
 - [x] `.github/workflows/pr-check.yml`を作成し、型チェック・Lint・ビルド確認を実行する基本CIパイプラインを構築する（ARCH 11.1章）
-- [ ] mainブランチに保護ルール（上記CIチェック必須）を設定する
+- [x] mainブランチに保護ルール（上記CIチェック必須）を設定する
 - [ ] Supabaseプロジェクトを作成する
 - [ ] Vercelプロジェクトを作成し、GitHubリポジトリと連携する（ARCH 11.2章）
 - [ ] 環境変数を整理する：`SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ANTHROPIC_API_KEY`（ローカルは`.env.local`、本番はVercelのSecretsに設定。REQ 20.1章）
