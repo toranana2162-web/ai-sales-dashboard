@@ -53,3 +53,12 @@ create table if not exists ai_reports (
   notable_points text,
   next_actions text
 );
+
+-- RLS(行レベルセキュリティ)を有効にする
+-- ポリシー(許可ルール)は1つも作らないため、anon/authenticatedキーからのアクセスはすべて拒否される。
+-- サーバー側で使うservice_role keyはRLSの影響を受けないため、アプリの動作には影響しない。
+-- (ARCHITECTURE.md 8章・12章、REQUIREMENTSv2.md 20.3章に対応)
+alter table profiles enable row level security;
+alter table monthly_uploads enable row level security;
+alter table sales_transactions enable row level security;
+alter table ai_reports enable row level security;
