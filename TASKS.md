@@ -16,8 +16,8 @@
 
 - [x] Next.js（App Router）+ TypeScriptプロジェクトを初期化する
 - [x] Tailwind CSSを導入し、基本カラー（白／ネイビー `#1A2E5C`）をテーマ設定する（REQ 18章）
-- [ ] GitHubリポジトリを作成する
-- [ ] `.github/workflows/pr-check.yml`を作成し、型チェック・Lint・ビルド確認を実行する基本CIパイプラインを構築する（ARCH 11.1章）
+- [x] GitHubリポジトリを作成する
+- [x] `.github/workflows/pr-check.yml`を作成し、型チェック・Lint・ビルド確認を実行する基本CIパイプラインを構築する（ARCH 11.1章）
 - [ ] mainブランチに保護ルール（上記CIチェック必須）を設定する
 - [ ] Supabaseプロジェクトを作成する
 - [ ] Vercelプロジェクトを作成し、GitHubリポジトリと連携する（ARCH 11.2章）
