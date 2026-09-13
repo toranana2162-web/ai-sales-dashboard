@@ -20,8 +20,8 @@
 - [x] `.github/workflows/pr-check.yml`を作成し、型チェック・Lint・ビルド確認を実行する基本CIパイプラインを構築する（ARCH 11.1章）
 - [x] mainブランチに保護ルール（上記CIチェック必須）を設定する
 - [x] Supabaseプロジェクトを作成する
-- [ ] Vercelプロジェクトを作成し、GitHubリポジトリと連携する（ARCH 11.2章）
-- [ ] 環境変数を整理する：`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ANTHROPIC_API_KEY`（ローカルは`.env.local`、本番はVercelのSecretsに設定。REQ 20.1章）
+- [x] Vercelプロジェクトを作成し、GitHubリポジトリと連携する（ARCH 11.2章）
+- [x] 環境変数を整理する：`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ANTHROPIC_API_KEY`（ローカルは`.env.local`、本番はVercelのSecretsに設定。REQ 20.1章。`ANTHROPIC_API_KEY`はMilestone 6で取得次第、同じ手順で追加する）
 
 ---
 
