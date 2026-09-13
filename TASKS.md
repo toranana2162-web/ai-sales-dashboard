@@ -21,7 +21,7 @@
 - [x] mainブランチに保護ルール（上記CIチェック必須）を設定する
 - [x] Supabaseプロジェクトを作成する
 - [ ] Vercelプロジェクトを作成し、GitHubリポジトリと連携する（ARCH 11.2章）
-- [ ] 環境変数を整理する：`SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ANTHROPIC_API_KEY`（ローカルは`.env.local`、本番はVercelのSecretsに設定。REQ 20.1章）
+- [ ] 環境変数を整理する：`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `ANTHROPIC_API_KEY`（ローカルは`.env.local`、本番はVercelのSecretsに設定。REQ 20.1章）
 
 ---
 
