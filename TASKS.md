@@ -35,8 +35,8 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
 - [x] RPC関数`get_monthly_summary`を実装する（ARCH 6.1章）
 - [x] RPC関数`get_category_breakdown`を実装する（ARCH 6.3章）
 - [x] RPC関数`get_sku_ranking`を実装する（ARCH 6.4章）
-- [ ] RPC関数`get_monthly_trend`を実装する（ARCH 6.5章）
-- [ ] ローカル/テスト環境でマイグレーションを流し、`replace_monthly_sales`をダミーデータで手動実行して一連の状態遷移（pending→completed、再アップロード時の置換）を確認する
+- [x] RPC関数`get_monthly_trend`を実装する（ARCH 6.5章）
+- [x] ローカル/テスト環境でマイグレーションを流し、`replace_monthly_sales`をダミーデータで手動実行して一連の状態遷移（pending→completed、再アップロード時の置換）を確認する（あわせて全RPC関数の動作もダミーデータで確認済み）
 
 ---
 
