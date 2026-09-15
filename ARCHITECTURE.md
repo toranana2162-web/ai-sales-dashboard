@@ -397,7 +397,7 @@ Claude API呼び出しがエラー・タイムアウトになった場合、`ai_
 - Supabase Authのメール＋パスワード認証を使用する
 - セルフサインアップ画面は実装しない（27章）。アカウントはSupabaseダッシュボードまたは管理用スクリプト（Supabase Admin API）を用いて開発者が7名分を事前作成する
 - 認証済みユーザーは全員同一のダッシュボード・データにアクセス可能とする（3.3章：役職別権限制御は行わない）
-- Next.jsのmiddlewareで未認証アクセスをログイン画面へリダイレクトする
+- Next.jsのProxy（`proxy.ts`。旧称:middleware）で未認証アクセスをログイン画面へリダイレクトする
 - ブラウザから直接呼び出すSupabase機能はAuth（ログイン・セッション確認）のみとする。`sales_transactions`等のデータ取得・更新は必ずNext.jsのAPIルートを経由し、そこでセッションを検証したうえでサーバー側から`@supabase/supabase-js`／RPCを呼び出す（20.3章）
 
 ---
@@ -434,7 +434,7 @@ lib/
   kpi/           # RPC呼び出しのラッパー
   ai/            # Claude API呼び出し・プロンプト
   db/            # Supabaseクライアント
-  auth/          # middleware・セッション検証
+  auth/          # Proxy(旧:middleware)・セッション検証
 supabase/
   migrations/    # テーブル定義・RPC関数(replace_monthly_sales, get_monthly_summary 等)のSQLマイグレーション
 components/

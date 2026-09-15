@@ -44,7 +44,7 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
 
 - [x] Supabase Authを有効化し、Next.js（App Router）用のSupabase SSRクライアントを実装する
 - [x] ログイン画面（メール＋パスワード）を実装する
-- [ ] middlewareで未認証アクセスをログイン画面へリダイレクトする（ARCH 8章）
+- [x] Proxy（`proxy.ts`。旧称:middleware）で未認証アクセスをログイン画面へリダイレクトする（ARCH 8章）
 - [ ] 全APIルートでセッション検証を行う共通処理を実装する（ARCH 12章・REQ 20.3章）
 - [ ] ブラウザから直接呼び出すSupabase処理をAuth関連のみに限定し、データ系のRPC・テーブルアクセスはNext.js APIルート経由のみで行われることをコードレビューで確認する（ARCH 8章）
 - [ ] 利用者7名分のアカウントをSupabaseダッシュボード（またはAdmin API）で作成し、対応する`profiles`行を作成する（REQ 27章：セルフサインアップは実装しない）
