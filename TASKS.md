@@ -42,7 +42,7 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
 
 ## Milestone 2: 認証
 
-- [ ] Supabase Authを有効化し、Next.js（App Router）用のSupabase SSRクライアントを実装する
+- [x] Supabase Authを有効化し、Next.js（App Router）用のSupabase SSRクライアントを実装する
 - [ ] ログイン画面（メール＋パスワード）を実装する
 - [ ] middlewareで未認証アクセスをログイン画面へリダイレクトする（ARCH 8章）
 - [ ] 全APIルートでセッション検証を行う共通処理を実装する（ARCH 12章・REQ 20.3章）
