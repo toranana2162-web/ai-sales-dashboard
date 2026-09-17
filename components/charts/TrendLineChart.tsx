@@ -35,6 +35,7 @@ export function TrendLineChart({
             <CartesianGrid stroke="#e4e4e7" vertical={false} />
             <XAxis
               dataKey="month"
+              interval={0}
               tick={{ fontSize: 12, fill: "#71717a" }}
               axisLine={{ stroke: "#e4e4e7" }}
               tickLine={false}
