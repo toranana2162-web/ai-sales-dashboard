@@ -70,7 +70,7 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
 
 ## Milestone 4: KPI集計API
 
-- [ ] `lib/kpi/`にRPC呼び出しのラッパー関数を実装する
+- [x] `lib/kpi/`にRPC呼び出しのラッパー関数を実装する
 - [ ] `GET /api/months`を実装する（データが存在する対象月一覧）
 - [ ] `GET /api/kpi?month=YYYY-MM`を実装する
   - [ ] `get_monthly_summary` / `get_category_breakdown` / `get_sku_ranking`を呼び出す
@@ -78,7 +78,7 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
   - [ ] `unique_customers = 0`、または対象月より前のデータが存在しない場合にリピート率を「算出不可」として返す（REQ 10.4章）
   - [ ] 粗利率（粗利÷売上×100）をアプリ層で算出し補助情報として返す（REQ 10.3章）
 - [ ] `GET /api/kpi/trend?month=YYYY-MM&months=12`を実装する（`get_monthly_trend`を呼び出し、`repeat_rate`が`NULL`の月を「算出不可」として返す）
-- [ ] RPCラッパー関数の単体テスト（RPC呼び出しをモック）を実装する
+- [x] RPCラッパー関数の単体テスト（RPC呼び出しをモック）を実装する
 
 ---
 
