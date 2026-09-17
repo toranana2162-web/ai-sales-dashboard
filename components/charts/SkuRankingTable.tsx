@@ -9,9 +9,7 @@ import { formatCurrency } from "@/lib/kpi/format";
 export function SkuRankingTable({ data }: { data: SkuRanking[] }) {
   return (
     <div className="rounded-lg border border-zinc-200 p-4">
-      <h3 className="text-sm font-semibold text-zinc-700">
-        SKU別売上TOP{data.length}
-      </h3>
+      <h3 className="text-sm font-semibold text-zinc-700">SKU別売上TOP10</h3>
       <div className="mt-2 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="text-zinc-500">
