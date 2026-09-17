@@ -77,7 +77,7 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
   - [x] 前月分の`get_monthly_summary`を呼び出し、前月データが無ければ「比較データなし」を返す（REQ 11章）
   - [x] `unique_customers = 0`、または対象月より前のデータが存在しない場合にリピート率を「算出不可」として返す（REQ 10.4章）
   - [x] 粗利率（粗利÷売上×100）をアプリ層で算出し補助情報として返す（REQ 10.3章）
-- [ ] `GET /api/kpi/trend?month=YYYY-MM&months=12`を実装する（`get_monthly_trend`を呼び出し、`repeat_rate`が`NULL`の月を「算出不可」として返す）
+- [x] `GET /api/kpi/trend?month=YYYY-MM&months=12`を実装する（`get_monthly_trend`を呼び出し、`repeat_rate`が`NULL`の月を「算出不可」として返す）
 - [x] RPCラッパー関数の単体テスト（RPC呼び出しをモック）を実装する
 
 ---
