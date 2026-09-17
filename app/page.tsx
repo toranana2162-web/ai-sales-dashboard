@@ -1,106 +1,113 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { UploadForm } from "@/components/upload/UploadForm";
+import { KpiCards } from "@/components/kpi-cards/KpiCards";
+import type { KpiResponse } from "@/types/kpi";
 
-type UploadResult = {
-  targetMonth: string;
-  rowCount: number;
-};
+function toMonthParam(targetMonth: string): string {
+  // "2025-11-01" -> "2025-11"
+  return targetMonth.slice(0, 7);
+}
 
 export default function Home() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [months, setMonths] = useState<string[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [kpi, setKpi] = useState<KpiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<UploadResult | null>(null);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setResult(null);
+  const loadMonths = useCallback(async () => {
+    const response = await fetch("/api/months");
+    const data = await response.json();
+    const fetchedMonths: string[] = data.months ?? [];
+    setMonths(fetchedMonths);
 
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
-      setError("ファイルが選択されていません。");
+    // 未選択、または選択中の月がデータから消えた場合は最新月を選び直す
+    setSelectedMonth((current) => {
+      if (current && fetchedMonths.includes(current)) return current;
+      return fetchedMonths[0] ?? null;
+    });
+  }, []);
+
+  useEffect(() => {
+    void loadMonths();
+  }, [loadMonths]);
+
+  useEffect(() => {
+    if (!selectedMonth) {
       return;
     }
 
+    let cancelled = false;
     setLoading(true);
+    setError(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/api/uploads", {
-        method: "POST",
-        body: formData,
+    fetch(`/api/kpi?month=${toMonthParam(selectedMonth)}`)
+      .then(async (response) => {
+        const data = await response.json();
+        if (cancelled) return;
+        if (!response.ok) {
+          setError(data.error ?? "データの取得に失敗しました。");
+          setKpi(null);
+          return;
+        }
+        setKpi(data);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError("通信に失敗しました。");
+          setKpi(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
-      const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error ?? "アップロードに失敗しました。");
-        return;
-      }
-
-      setResult(data);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch {
-      setError(
-        "通信に失敗しました。ネットワーク状況を確認して再度お試しください。",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMonth]);
 
   return (
-    <div className="flex min-h-screen flex-1 items-center justify-center bg-white">
-      <div className="w-full max-w-md space-y-4 rounded-lg border border-zinc-200 p-8">
-        <div>
-          <h1 className="text-xl font-semibold text-navy">
-            AI搭載 売上分析ダッシュボード
-          </h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Shopifyの売上CSVをアップロードしてください
-          </p>
-        </div>
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
+      <header>
+        <h1 className="text-xl font-semibold text-navy">
+          AI搭載 売上分析ダッシュボード
+        </h1>
+      </header>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            className="block w-full text-sm text-zinc-700 file:mr-3 file:rounded file:border-0 file:bg-navy file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
-          />
+      <UploadForm onUploaded={loadMonths} />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded bg-navy px-3 py-2 text-sm font-medium text-white transition-opacity disabled:opacity-50"
-          >
-            {loading ? "アップロード中..." : "アップロード"}
-          </button>
-        </form>
-
-        {error && (
-          <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
-            {error}
-          </p>
-        )}
-
-        {result && (
-          <p className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">
-            {result.targetMonth}分のデータを{result.rowCount}
-            件登録しました。
-          </p>
-        )}
-
-        <p className="text-xs text-zinc-400">
-          （この画面は仮のものです。Milestone
-          5で本来のダッシュボード画面に置き換えます）
-        </p>
+      <div className="flex items-center gap-3">
+        <label htmlFor="month-select" className="text-sm text-zinc-700">
+          対象月
+        </label>
+        <select
+          id="month-select"
+          value={selectedMonth ?? ""}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          disabled={months.length === 0}
+          className="rounded border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 focus:border-navy focus:outline-none"
+        >
+          {months.length === 0 && <option value="">データがありません</option>}
+          {months.map((m) => (
+            <option key={m} value={m}>
+              {toMonthParam(m)}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {loading && <p className="text-sm text-zinc-500">読み込み中...</p>}
+
+      {error && (
+        <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+
+      {selectedMonth && kpi && <KpiCards kpi={kpi} />}
     </div>
   );
 }
