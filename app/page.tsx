@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { UploadForm } from "@/components/upload/UploadForm";
 import { KpiCards } from "@/components/kpi-cards/KpiCards";
 import { TrendSection } from "@/components/charts/TrendSection";
+import { CategoryBarChart } from "@/components/charts/CategoryBarChart";
+import { SkuRankingTable } from "@/components/charts/SkuRankingTable";
 import type { KpiResponse, MonthlyTrendPoint } from "@/types/kpi";
 
 function toMonthParam(targetMonth: string): string {
@@ -119,6 +121,19 @@ export default function Home() {
       {selectedMonth && kpi && <KpiCards kpi={kpi} />}
 
       <TrendSection trend={trend} />
+
+      {kpi && (
+        <section className="space-y-4">
+          <h2 className="text-sm font-semibold text-zinc-700">補助分析</h2>
+          <p className="text-sm text-zinc-600">
+            販売数量: {kpi.totalQuantity.toLocaleString("ja-JP")}
+          </p>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <CategoryBarChart data={kpi.categoryBreakdown} />
+            <SkuRankingTable data={kpi.skuRanking} />
+          </div>
+        </section>
+      )}
     </div>
   );
 }
