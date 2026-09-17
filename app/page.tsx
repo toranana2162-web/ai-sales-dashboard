@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { UploadForm } from "@/components/upload/UploadForm";
 import { KpiCards } from "@/components/kpi-cards/KpiCards";
-import type { KpiResponse } from "@/types/kpi";
+import { TrendSection } from "@/components/charts/TrendSection";
+import type { KpiResponse, MonthlyTrendPoint } from "@/types/kpi";
 
 function toMonthParam(targetMonth: string): string {
   // "2025-11-01" -> "2025-11"
@@ -14,6 +15,7 @@ export default function Home() {
   const [months, setMonths] = useState<string[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [kpi, setKpi] = useState<KpiResponse | null>(null);
+  const [trend, setTrend] = useState<MonthlyTrendPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,21 +45,28 @@ export default function Home() {
     setLoading(true);
     setError(null);
 
-    fetch(`/api/kpi?month=${toMonthParam(selectedMonth)}`)
-      .then(async (response) => {
-        const data = await response.json();
+    const month = toMonthParam(selectedMonth);
+
+    Promise.all([
+      fetch(`/api/kpi?month=${month}`).then((r) => r.json().then((data) => ({ r, data }))),
+      fetch(`/api/kpi/trend?month=${month}`).then((r) => r.json().then((data) => ({ r, data }))),
+    ])
+      .then(([kpiResult, trendResult]) => {
         if (cancelled) return;
-        if (!response.ok) {
-          setError(data.error ?? "データの取得に失敗しました。");
+        if (!kpiResult.r.ok) {
+          setError(kpiResult.data.error ?? "データの取得に失敗しました。");
           setKpi(null);
+          setTrend([]);
           return;
         }
-        setKpi(data);
+        setKpi(kpiResult.data);
+        setTrend(trendResult.r.ok ? trendResult.data.trend : []);
       })
       .catch(() => {
         if (!cancelled) {
           setError("通信に失敗しました。");
           setKpi(null);
+          setTrend([]);
         }
       })
       .finally(() => {
@@ -108,6 +117,8 @@ export default function Home() {
       )}
 
       {selectedMonth && kpi && <KpiCards kpi={kpi} />}
+
+      <TrendSection trend={trend} />
     </div>
   );
 }
