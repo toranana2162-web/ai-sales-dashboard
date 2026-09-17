@@ -1,6 +1,6 @@
 # 実装進捗メモ
 
-最終更新: 2026-09-16
+最終更新: 2026-09-17
 
 このファイルは「今どこまで進んでいて、次に何をするか」を記録するための作業メモです。
 正式な仕様はREQUIREMENTSv2.md、設計はARCHITECTURE.md、作業リストはTASKS.md、
@@ -10,41 +10,36 @@
 
 ## 今の状態（ひとことで）
 
-**Milestone 0（プロジェクト基盤）・Milestone 1（データベース・RPC関数）・Milestone 2（認証）が全て完了。** Milestone 3（CSVアップロード機能）に着手する段階。
+**Milestone 0〜3（プロジェクト基盤・データベース・認証・CSVアップロード）がすべて完了。** Milestone 4（KPI集計API）に着手する段階。
 
 ---
 
 ## 完了したこと
 
-### Milestone 0・1：省略（DEVLOG.md参照）
+### Milestone 0・1・2：省略（DEVLOG.md参照）
 
-### Milestone 2: 認証（すべて完了）
-- `@supabase/ssr` / `@supabase/supabase-js` を導入
-- Supabaseクライアントを3種類作成
-  - `lib/db/supabase-browser.ts`（ブラウザ用、Authのみ使用）
-  - `lib/db/supabase-server.ts`（サーバー用、ログイン状態確認）
-  - `lib/db/supabase-admin.ts`（service_role key、APIルートからのDB操作用）
-- ログイン画面 `app/(auth)/login/page.tsx`（メール＋パスワード）
-- `proxy.ts`（Next.js 16でのmiddlewareの新名称）で未ログイン時のリダイレクトを実装
-  - 自動移行ツール`@next/codemod middleware-to-proxy`で`middleware.ts`から移行
-- `lib/auth/require-user.ts`：APIルート用のログイン確認共通処理（実際の適用はMilestone 3以降）
-- コードレビューで、ブラウザ側はAuth関連のみ使用していることを確認済み
-- Supabase Authに動作確認用アカウントを1つ作成し、`profiles`行も作成済み
-- **ローカル環境（`npm run dev`）で実際にログイン→トップページ表示までEnd-to-Endで動作確認済み**
+### Milestone 3: CSVアップロード機能（すべて完了）
+- `csv-parse` / `zod` / `vitest` を導入
+- `lib/csv/parse-sales-csv.ts`：CSV検証ロジック（UTF-8チェック・パース・8列チェック・型チェック・空データチェック・複数月混在チェック・返品負数許容）
+- `lib/csv/parse-sales-csv.test.ts`：単体テスト10件（実際のサンプルCSVでのテスト含む、全件成功）
+- `app/api/uploads/route.ts`：`POST /api/uploads`（ログイン確認→ファイル検証→`replace_monthly_sales`RPC呼び出し）
+- `app/page.tsx`：アップロード画面（ログイン後のトップページ。ファイル選択・送信・結果表示）
+- 依存関係の都合で`@types/node`を実際のNode.jsバージョン（v24）に合わせて更新
 
-**発生した不具合と対応**：Next.jsのデフォルトテンプレートに残っていたダークモード自動切り替え設定が原因で、ログイン画面の入力文字が見えなくなる問題が発生。原因を特定し、ダークモード切り替え設定を削除して修正済み。
+**動作確認済みの内容（ローカル環境でEnd-to-Endテスト）**：
+- 単一月のCSV（サンプルCSVの11月分を抽出）をアップロード→「15件登録しました」と正しく表示
+- データベース上でも、以前のダミーデータが新しい15件に正しく置き換わっていることを確認
+- 複数月混在CSV（正式サンプルそのもの）をアップロード→「複数の月のデータが混在しています」という分かりやすいエラーメッセージが画面に表示されることを確認
 
 ---
 
-## 次にやること：Milestone 3（CSVアップロード機能）
+## 次にやること：Milestone 4（KPI集計API）
 
-- [ ] アップロードUI（ファイル選択・送信）を実装する
-- [ ] `POST /api/uploads`を実装する（ファイル形式・UTF-8チェック、csv-parseでパース、Zodスキーマ検証、対象月自動判定、`replace_monthly_sales`のRPC呼び出し）
-- [ ] 検証エラー時のエラーメッセージ表示
-- [ ] アップロード成功時の結果表示
-- [ ] CSV検証ロジックの単体テスト
-
-このMilestoneから`lib/auth/require-user.ts`を実際に使い始める。
+- [ ] `lib/kpi/`にRPC呼び出しのラッパー関数を実装する
+- [ ] `GET /api/months`を実装する
+- [ ] `GET /api/kpi?month=YYYY-MM`を実装する（売上・粗利・リピート率・前月比較・カテゴリ別・SKU TOP10）
+- [ ] `GET /api/kpi/trend?month=YYYY-MM&months=12`を実装する
+- [ ] RPCラッパー関数の単体テスト
 
 ---
 
@@ -56,5 +51,6 @@
 - 章番号の引用は「REQ」（REQUIREMENTSv2.md）「ARCH」（ARCHITECTURE.md）を付けて区別している
 - 秘密情報（Secret key等）はチャットに貼らず、ユーザー自身がファイルへ直接入力する運用にしている
 - Next.js 16では「middleware」が「Proxy」に名称変更されている（`proxy.ts`）
-- ローカル開発サーバーは`npm run dev`で起動（今回はポート3001で稼働中の場合あり。ポート3000は別プロセスが使用中）
-- サンプルCSV（`case8-sales-sample.csv`）がプロジェクト直下にあり、Milestone 3のテストに使える
+- テストは`npm test`（Vitest）で実行。CIへの組み込みはMilestone 7で予定通り実施
+- `tmp-test-data/`はGit管理対象外の一時テストファイル置き場（単一月の動作確認用CSVなどを置く）
+- 正式サンプルCSV（`case8-sales-sample.csv`）は9〜11月の3か月分が混在しており、そのままアップロードするとエラーになる仕様（意図通り）
