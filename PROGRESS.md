@@ -10,7 +10,7 @@
 
 ## 今の状態（ひとことで）
 
-**Milestone 5（ダッシュボードUI）はほぼ完了、残り2項目（レスポンシブ確認・ブラウザ動作確認）が途中。**
+**Milestone 0〜5（プロジェクト基盤〜ダッシュボードUI）がすべて完了。** Milestone 6（AI分析機能）に着手する段階。
 
 ---
 
@@ -18,41 +18,26 @@
 
 ### Milestone 0〜4：省略（DEVLOG.md参照）
 
-### Milestone 5: ダッシュボードUI（レスポンシブ・ブラウザ確認を除き完了）
-- `app/page.tsx`：ダッシュボードのメイン画面（月選択・KPIカード・グラフ・補助分析をまとめて表示）
-- `components/upload/UploadForm.tsx`：アップロードフォーム(部品化)
-- `components/kpi-cards/KpiCards.tsx`：売上・粗利・リピート率のKPIカード(前月比・算出不可表示含む)
-- `components/charts/TrendLineChart.tsx`・`TrendSection.tsx`：月次推移の折れ線グラフ3種+表(Recharts)
-- `components/charts/CategoryBarChart.tsx`：カテゴリ別売上の棒グラフ
-- `components/charts/SkuRankingTable.tsx`：SKU別売上TOP10の表
-- `lib/kpi/format.ts`：前月比計算・通貨/パーセント表示のフォーマット関数(4件テスト)
-- グラフ実装にあたりdatavizスキルを参照(単一系列のため凡例なし、ブランドカラーのネイビーを使用)
-
-**動作確認済みの内容（ローカル環境で実際にブラウザから確認）**：
-- 対象月切り替え、KPIカード（数値・前月比・算出不可表示）が正しく動作
-- 月次推移グラフで「算出不可」の月が欠損として正しく表示される（線が途切れる）
-- カテゴリ別売上・SKU別TOP10・販売数量が、11月の実データ(4カテゴリ・8SKU)で正しく表示される
-
-**発生した問題と対応**：
-- Next.js 16のデフォルトLintルール`react-hooks/set-state-in-effect`が、`useEffect`内でのデータ取得という一般的なパターンを一律エラーにしてしまうため、このルールのみ無効化（`eslint.config.mjs`にコメントで理由を記載）
-- Rechartsのx軸ラベルが一部省略される問題 → `interval={0}`で解消
-- SKU別ランキングの見出しが実件数に応じて「TOP1」等に変わってしまう問題 → 常に「TOP10」固定表示に修正
+### Milestone 5: ダッシュボードUI（すべて完了）
+- ダッシュボードのメイン画面(`app/page.tsx`)：月選択・KPIカード・グラフ・補助分析を1画面にまとめて表示
+- KPIカード（売上・粗利・リピート率、前月比・算出不可表示）
+- 月次推移グラフ3種（Recharts、リピート率の算出不可を欠損表示）
+- カテゴリ別売上棒グラフ、SKU別売上TOP10表、販売数量表示
+- レスポンシブ対応：iPhone 12 Pro幅(390px)で崩れが無いことを確認済み
+- ブラウザ確認：Chromeで一連の動作確認を実施済み
 
 ---
 
-## 次にやること：Milestone 5の残り2項目 → その後Milestone 6
+## 次にやること：Milestone 6（AI分析機能）
 
-- [ ] レスポンシブ対応を確認する（スマートフォン幅で大きく崩れないか、ブラウザの開発者ツールで確認中）
-- [ ] 主要な最新版Chromium系ブラウザでの動作確認
+- [ ] `lib/ai/`にClaude APIクライアントを実装する（モデル：`claude-haiku-4-5`）
+- [ ] Structured Outputsで出力スキーマ（summary / key_changes / top_contributors / notable_points / next_actions、数値フィールドなし）を定義する
+- [ ] システムプロンプトを実装する（コンサルタントトーン、推測表現、比較データなし時の扱い）
+- [ ] `GET /api/ai-report`を実装する（既存レコードがあれば返す、無ければ生成して保存、AI失敗時はエラー表示）
+- [ ] ダッシュボードにAI分析結果を表示する
+- [ ] AI連携ロジックの単体テスト
 
-その後はMilestone 6（AI分析機能）に進む：
-- `lib/ai/`にClaude APIクライアントを実装（モデル：`claude-haiku-4-5`）
-- Structured Outputsで出力スキーマを定義
-- システムプロンプトを実装
-- `GET /api/ai-report`を実装
-- ダッシュボードにAI分析結果を表示
-
-**Milestone 6に進む前に、Anthropic APIキーの取得が必要**（`.env.local`の`ANTHROPIC_API_KEY`が未設定）。
+**Milestone 6に進む前に、Anthropic APIキーの取得が必要**（`.env.local`の`ANTHROPIC_API_KEY`が未設定。ユーザー側でAPIキーを取得してもらう必要がある）。
 
 ---
 
@@ -62,7 +47,8 @@
 - GitHub・Supabase・Vercel・APIキーなど、外部サービスに関わる操作はAIが勝手に進めず、ユーザーへの手順案内という形で進める
 - TASKS.md、ARCHITECTURE.md、REQUIREMENTSv2.mdに無い機能は追加しない
 - 章番号の引用は「REQ」（REQUIREMENTSv2.md）「ARCH」（ARCHITECTURE.md）を付けて区別している
-- 秘密情報（Secret key等）はチャットに貼らず、ユーザー自身がファイルへ直接入力する運用にしている
+- 秘密情報（Secret key・APIキー等）はチャットに貼らず、ユーザー自身がファイルへ直接入力する運用にしている
 - テストは`npm test`（Vitest）で実行。CIへの組み込みはMilestone 7で予定通り実施
 - 開発サーバーはポートが3000/3001と変わることがある
 - 現在DBに入っている実データ：2025年11月(15件、正式サンプルCSVより)、2025年12月(C999さんのダミー1件)
+- `eslint.config.mjs`で`react-hooks/set-state-in-effect`ルールを無効化済み（理由はコメント参照）
