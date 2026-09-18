@@ -98,9 +98,9 @@ ARCH 4章・6章の設計をそのままマイグレーションとして実装�
 
 ## Milestone 6: AI分析機能
 
-- [ ] `lib/ai/`にClaude APIクライアントを実装する（モデル：`claude-haiku-4-5`）
-- [ ] Structured Outputsで出力スキーマ（summary / key_changes / top_contributors / notable_points / next_actions、数値フィールドなし）を定義する（ARCH 7.1章）
-- [ ] システムプロンプトを実装する（コンサルタントトーン、推測表現の使用、渡された数値以外を生成しない指示、比較データなし時の扱い。ARCH 7.3章）
+- [x] `lib/ai/`にClaude APIクライアントを実装する（モデル：`claude-haiku-4-5`）
+- [x] Structured Outputsで出力スキーマ（summary / key_changes / top_contributors / notable_points / next_actions、数値フィールドなし）を定義する（ARCH 7.1章）
+- [x] システムプロンプトを実装する（コンサルタントトーン、推測表現の使用、渡された数値以外を生成しない指示、比較データなし時の扱い。ARCH 7.3章）
 - [ ] `GET /api/ai-report?month=YYYY-MM`を実装する
   - [ ] `ai_reports`に既存レコードがあればそれを返す
   - [ ] 無ければ`/api/kpi`相当のデータを整形してAIへ渡し、生成結果を`ai_reports`へ保存してから返す（AIへ渡した構造化データは`input_payload`列に保存する。前月データが無い指標は`comparison_available: false`として明示する。ARCH 7.2章・ARCH 4.1章）
