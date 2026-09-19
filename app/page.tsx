@@ -6,7 +6,16 @@ import { KpiCards } from "@/components/kpi-cards/KpiCards";
 import { TrendSection } from "@/components/charts/TrendSection";
 import { CategoryBarChart } from "@/components/charts/CategoryBarChart";
 import { SkuRankingTable } from "@/components/charts/SkuRankingTable";
+import { AiReportSection } from "@/components/ai/AiReportSection";
 import type { KpiResponse, MonthlyTrendPoint } from "@/types/kpi";
+
+type AiReport = {
+  summary: string;
+  key_changes: string;
+  top_contributors: string;
+  notable_points: string;
+  next_actions: string;
+};
 
 function toMonthParam(targetMonth: string): string {
   // "2025-11-01" -> "2025-11"
@@ -20,6 +29,9 @@ export default function Home() {
   const [trend, setTrend] = useState<MonthlyTrendPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiReport, setAiReport] = useState<AiReport | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const loadMonths = useCallback(async () => {
     const response = await fetch("/api/months");
@@ -80,6 +92,43 @@ export default function Home() {
     };
   }, [selectedMonth]);
 
+  // AI分析はKPI表示とは別に取得する。生成に時間がかかっても、
+  // KPIカードやグラフの表示には影響させない(ARCHITECTURE.md 7.5章)。
+  useEffect(() => {
+    if (!selectedMonth) {
+      return;
+    }
+
+    let cancelled = false;
+    setAiLoading(true);
+    setAiError(null);
+
+    fetch(`/api/ai-report?month=${toMonthParam(selectedMonth)}`)
+      .then(async (response) => {
+        const data = await response.json();
+        if (cancelled) return;
+        if (!response.ok) {
+          setAiError(data.error ?? "AI分析の取得に失敗しました。");
+          setAiReport(null);
+          return;
+        }
+        setAiReport(data);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAiError("AI分析の取得に失敗しました。");
+          setAiReport(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setAiLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMonth]);
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       <header>
@@ -119,6 +168,10 @@ export default function Home() {
       )}
 
       {selectedMonth && kpi && <KpiCards kpi={kpi} />}
+
+      {selectedMonth && (
+        <AiReportSection report={aiReport} loading={aiLoading} error={aiError} />
+      )}
 
       <TrendSection trend={trend} />
 
