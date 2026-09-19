@@ -125,3 +125,16 @@
 - レスポンシブ対応を確認：iPhone 12 Pro幅(390px)でKPIカードが縦積みになり、グラフも横幅に収まって崩れないことを確認
 - ブラウザ動作確認：Chromeで一連の動作確認をすでに実施済みであることを確認し完了とした
 - Milestone 5の全タスクが完了
+
+**Milestone 6（AI分析機能）着手・コード実装完了**
+
+- Anthropic APIキーを取得し、`.env.local`に設定
+- Claude API TypeScript SDKの使い方(`client.messages.parse` + `zodOutputFormat`によるStructured Outputs)をclaude-apiスキルで確認してから実装
+- `/api/kpi`と`/api/ai-report`で共通のKPI組み立てロジックを`buildKpiResponse`としてリファクタリング
+- AI入力データ変換ロジック(`comparison_available`の明示)、Claude APIクライアント(モデル：`claude-haiku-4-5`)、システムプロンプトを実装
+- `GET /api/ai-report`を実装し、11月(比較データなし)・12月(比較データあり)の両方でAIの生成内容が正確であることを確認
+  - 数値の捏造が無いこと、前月データが無い月では比較コメントをしないこと、深刻な変化には適切なヘッジ表現で言及することを確認
+  - 再アクセス時に再生成されず保存済み結果が返ること(キャッシュ)を確認
+- ダッシュボードへのAI分析結果表示(5セクション)を実装
+- テストしやすいようClaude APIクライアントを依存性注入の形にリファクタリングし、モックを使った単体テストを追加
+- Vercelへの`ANTHROPIC_API_KEY`設定を残して休憩

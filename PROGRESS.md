@@ -10,34 +10,41 @@
 
 ## 今の状態（ひとことで）
 
-**Milestone 0〜5（プロジェクト基盤〜ダッシュボードUI）がすべて完了。** Milestone 6（AI分析機能）に着手する段階。
+**Milestone 0〜6（プロジェクト基盤〜AI分析機能）のコード実装はすべて完了。** 1点だけ、Vercel（本番環境）への`ANTHROPIC_API_KEY`設定が未完了。
 
 ---
 
 ## 完了したこと
 
-### Milestone 0〜4：省略（DEVLOG.md参照）
+### Milestone 0〜5：省略（DEVLOG.md参照）
 
-### Milestone 5: ダッシュボードUI（すべて完了）
-- ダッシュボードのメイン画面(`app/page.tsx`)：月選択・KPIカード・グラフ・補助分析を1画面にまとめて表示
-- KPIカード（売上・粗利・リピート率、前月比・算出不可表示）
-- 月次推移グラフ3種（Recharts、リピート率の算出不可を欠損表示）
-- カテゴリ別売上棒グラフ、SKU別売上TOP10表、販売数量表示
-- レスポンシブ対応：iPhone 12 Pro幅(390px)で崩れが無いことを確認済み
-- ブラウザ確認：Chromeで一連の動作確認を実施済み
+### Milestone 6: AI分析機能（コード実装は完了、本番環境変数の設定が残っている）
+- Anthropic APIキーを取得し、`.env.local`に設定済み
+- `lib/kpi/build-kpi-response.ts`：`/api/kpi`と`/api/ai-report`共通のKPI組み立てロジックとしてリファクタリング
+- `lib/ai/input-payload.ts`：KPIデータをAI入力形式に変換（前月データが無い指標は`comparison_available: false`を明示。3件テスト）
+- `lib/ai/generate-report.ts`：Claude APIクライアント（モデル：`claude-haiku-4-5`、Structured Outputs、システムプロンプト）。テストしやすいよう依存性注入の形にリファクタリング（3件テスト）
+- `app/api/ai-report/route.ts`：既存レコードがあれば返す／無ければ生成して保存
+- `components/ai/AiReportSection.tsx`：ダッシュボードでのAI分析結果表示（5セクション、エラー表示、生成中表示）
+
+**動作確認済みの内容（ローカル環境で実際にブラウザから確認）**：
+- 初回生成：11月分（比較データなし月）で、数値の捏造が無いこと、前月比較コメントをしないことを確認
+- 12月分（比較データあり月）で、前月比99%減少という深刻な状況を適切なヘッジ表現で指摘することを確認
+- 再アクセス時に再生成されず、保存済みの結果がそのまま返る（`generated_at`が変化しない）ことを確認
+- `ai_reports`行を削除して再アクセスすると、正しく再生成されることを確認（依存性注入リファクタリング後も動作確認済み）
+
+**残っているタスク**：
+- [ ] Vercel（本番環境）の環境変数に`ANTHROPIC_API_KEY`を追加し、再デプロイする
 
 ---
 
-## 次にやること：Milestone 6（AI分析機能）
+## 次にやること：Milestone 7（CI/CD）
 
-- [ ] `lib/ai/`にClaude APIクライアントを実装する（モデル：`claude-haiku-4-5`）
-- [ ] Structured Outputsで出力スキーマ（summary / key_changes / top_contributors / notable_points / next_actions、数値フィールドなし）を定義する
-- [ ] システムプロンプトを実装する（コンサルタントトーン、推測表現、比較データなし時の扱い）
-- [ ] `GET /api/ai-report`を実装する（既存レコードがあれば返す、無ければ生成して保存、AI失敗時はエラー表示）
-- [ ] ダッシュボードにAI分析結果を表示する
-- [ ] AI連携ロジックの単体テスト
+Vercelへの環境変数設定が終わったら、Milestone 7へ進む：
+- [ ] 基本CIパイプライン（`pr-check.yml`）へテスト実行ステップを追加する（Milestone3・4・6で追加した単体テスト、現在39件）
+- [ ] Vercelとの自動デプロイ連携を確認する
+- [ ] mainブランチ保護ルールを最終確認する
 
-**Milestone 6に進む前に、Anthropic APIキーの取得が必要**（`.env.local`の`ANTHROPIC_API_KEY`が未設定。ユーザー側でAPIキーを取得してもらう必要がある）。
+その後 Milestone 8（セキュリティ・非機能要件の確認）→ Milestone 9（受け入れテスト）で完了。
 
 ---
 
@@ -48,7 +55,6 @@
 - TASKS.md、ARCHITECTURE.md、REQUIREMENTSv2.mdに無い機能は追加しない
 - 章番号の引用は「REQ」（REQUIREMENTSv2.md）「ARCH」（ARCHITECTURE.md）を付けて区別している
 - 秘密情報（Secret key・APIキー等）はチャットに貼らず、ユーザー自身がファイルへ直接入力する運用にしている
-- テストは`npm test`（Vitest）で実行。CIへの組み込みはMilestone 7で予定通り実施
-- 開発サーバーはポートが3000/3001と変わることがある
+- テストは`npm test`（Vitest、現在39件）で実行。CIへの組み込みはMilestone 7で予定通り実施
 - 現在DBに入っている実データ：2025年11月(15件、正式サンプルCSVより)、2025年12月(C999さんのダミー1件)
-- `eslint.config.mjs`で`react-hooks/set-state-in-effect`ルールを無効化済み（理由はコメント参照）
+- `ai_reports`には11月・12月ともに生成済みのレコードがある
