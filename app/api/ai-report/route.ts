@@ -3,7 +3,11 @@ import { requireUser } from "@/lib/auth/require-user";
 import { createAdminClient } from "@/lib/db/supabase-admin";
 import { buildKpiResponse } from "@/lib/kpi/build-kpi-response";
 import { buildAiInputPayload } from "@/lib/ai/input-payload";
-import { AI_MODEL, generateAiReport } from "@/lib/ai/generate-report";
+import {
+  AI_MODEL,
+  createAnthropicClient,
+  generateAiReport,
+} from "@/lib/ai/generate-report";
 
 /**
  * AI分析結果を取得する。既に生成済みならそれを返し、無ければ生成して保存する。
@@ -60,7 +64,8 @@ export async function GET(request: Request) {
 
   let report;
   try {
-    report = await generateAiReport(inputPayload);
+    const anthropicClient = createAnthropicClient();
+    report = await generateAiReport(anthropicClient, inputPayload);
   } catch (err) {
     // ARCHITECTURE.md 7.5章: AI失敗時はAI分析欄にのみエラーを返す(KPI表示には影響させない)
     console.error("AI report generation failed:", err);

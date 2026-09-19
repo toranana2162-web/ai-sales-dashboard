@@ -30,14 +30,23 @@ const SYSTEM_PROMPT = `あなたは、ECブランド(アパレル)の経営者�
   前月との比較についてコメントしないでください`;
 
 /**
+ * Claude APIクライアントを作成する。ANTHROPIC_API_KEY環境変数から認証情報を読み込む。
+ */
+export function createAnthropicClient(): Anthropic {
+  return new Anthropic();
+}
+
+/**
  * KPIの構造化データをもとに、AI分析コメントを生成する。
  * ARCHITECTURE.md 7章に対応。
+ *
+ * client を引数で受け取る形にしているのは、テスト時に本物のAPIを呼ぶ代わりに
+ * 「ふり」をするクライアント(モック)を渡せるようにするため。
  */
 export async function generateAiReport(
+  client: Anthropic,
   inputPayload: object,
 ): Promise<AiReport> {
-  const client = new Anthropic();
-
   const response = await client.messages.parse({
     model: AI_MODEL,
     max_tokens: 2000,
