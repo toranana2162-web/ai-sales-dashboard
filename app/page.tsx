@@ -32,6 +32,9 @@ export default function Home() {
   const [aiReport, setAiReport] = useState<AiReport | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  // アップロードのたびに増やし、選択中の月が変わっていなくても
+  // KPI・グラフ・AI分析を再取得させるための合図として使う
+  const [refreshToken, setRefreshToken] = useState(0);
 
   const loadMonths = useCallback(async () => {
     const response = await fetch("/api/months");
@@ -90,7 +93,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [selectedMonth]);
+  }, [selectedMonth, refreshToken]);
 
   // AI分析はKPI表示とは別に取得する。生成に時間がかかっても、
   // KPIカードやグラフの表示には影響させない(ARCHITECTURE.md 7.5章)。
@@ -127,7 +130,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [selectedMonth]);
+  }, [selectedMonth, refreshToken]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
@@ -137,7 +140,12 @@ export default function Home() {
         </h1>
       </header>
 
-      <UploadForm onUploaded={loadMonths} />
+      <UploadForm
+        onUploaded={() => {
+          void loadMonths();
+          setRefreshToken((n) => n + 1);
+        }}
+      />
 
       <div className="flex items-center gap-3">
         <label htmlFor="month-select" className="text-sm text-zinc-700">
